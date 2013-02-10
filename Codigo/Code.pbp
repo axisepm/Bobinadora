@@ -1,0 +1,177 @@
+'****************************************************************
+'*  Name    : CODE.BAS                                          *
+'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
+'*  Notice  : Copyright (c) 2011 [select VIEW...EDITOR OPTIONS] *
+'*          : All Rights Reserved                               *
+'*  Date    : 17/12/2011                                        *
+'*  Version : 1.0                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+
+
+variables:
+define LCD_DREG     PORTB  'definimos que puerto vamos a usar para el LCD
+DEFINE LCD_DBIT     4      'A partir de que pin
+DEFINE LCD_RSREG    PORTA  'Definimos en que puerto esta el RS
+DEFINE LCD_RSBIT    1      'RA1
+DEFINE LCD_EREG     PORTA  'Definimos en que puerto esta el E
+DEFINE LCD_EBIT     0      'RA0                                                                      
+conteo var word     'Armamos la variable conteo. Esta variable la vamos a cortar en dos y la vamos a copiar a la EEPROM
+ongoing var bit     'Variable para trabajo pendiente. Esta variable la vamos a copiar en la EEPROM
+flagpulso var bit   'Variable Flag 
+halt   var bit      'Variable que utilizamos para no sobreescribir la EEPROM en pausa.   
+stopped Var bit     'Variable que utilizamos para que no parpadee el lcd en stop.
+pulsos var portb.0  'Variable para los pulsos que entran 
+start  var porta.2  'Variable para start
+pausa  var porta.3  'Variable para la pausa
+parar  var porta.4  'Variable para stoppear
+relay  var portb.3  'Variable para el pin del relay
+flash_lcd var byte 'Variable para flashear LCD
+TRISA=%00011100     'Todos los pines son salidas. RA2,RA3,RA4 son por ahora las entradas.(PORTA)
+TRISB=%00000001     'Todos los pines son salidas (PORTB) 
+pause 200
+lcdout $fe,1,"Welcome" 'Primer mensaje al LCD 
+'test remover antes de producción
+ongoing = 1
+conteo = 65530
+Write 1,ongoing       
+write 2,conteo.byte0
+write 3,conteo.byte1
+Pause 500
+
+test_ongoing:
+read 1,ongoing 'leemos la eeprom. El resultado va a la variable 'ongoing'
+Branch ongoing, [no_ongoing_job,ongoing_job]
+
+no_ongoing_job: 'Rutina que se ejecuta si no hay trabajo pendiente
+'To DO reescribir con un FOR
+FOr flash_lcd = 1 to 4
+lcdout $fe,1,"Starting new Job"
+pause 100
+lcdout $fe,1
+Pause 100
+NExt
+lcdout $fe,1,"Press start"
+Conteo=0   'Reseteamos el conteo a cero por las dudas
+
+
+listen_start_pin:       'testeamos el pin de entrada para saber cuando hay que arrancar
+if start=1 then job
+pause 50      
+goto listen_start_pin  'encierra esto en un loop hasta que haya una entrada. 
+
+job:
+high relay  'Mandamos un pulso para prender el relay
+ongoing=1
+write 1,ongoing 'Avisamos que hay un trabajo en progreso
+lcdout $FE,1, "Job in Progress"
+lcdout $FE,$C5,DEC conteo,  " turns"               
+
+watch_pulses:
+if pulsos=1 then 
+gosub sumar
+endif
+if pausa=1 then 
+gosub pausar
+endif
+if parar=1 then 
+gosub stoppear
+endif
+goto watch_pulses 'encierra hasta que haya un input
+
+sumar:
+pause 100
+conteo=conteo+1
+write 2,conteo.byte0
+Write 3,conteo.byte1
+lcdout $FE,$C5,DEC conteo,  " turns"
+return
+
+pausar:
+Low relay
+lcdout $FE,$1, "Work Paused"
+lcdout $FE,$C0, "Press start"
+'if halt=1 then goto pause_loop
+'halt=1
+write 2,conteo.byte0
+Write 3,conteo.byte1
+
+Pause_loop:
+if start=1 then goto resume_job
+goto pause_loop 
+
+Resume_job:
+pause 50
+flash_lcd = 0 
+for flash_lcd = 1 to 2 
+lcdout $fe,1,"Resuming job"
+pause 100
+lcdout $fe,1
+pause 100
+next
+goto job
+
+stoppear: 
+Pause 100
+low relay
+if stopped=1 then goto stop_loop
+stopped=1
+Lcdout $fe,1,"Cancel?"
+LCDout $fe,$C0, "Stop to confirm"
+
+Stop_loop: 
+if parar=1 then goto stop_sequence
+goto stop_loop
+
+Stop_sequence:     'TO DO: Revisar esta rutina
+Pause 100
+lcdout $fe,1, "Job stopped"
+LCDout $fe,$C0, "Press Start"
+conteo = 0 
+ongoing = 0 
+Write 1,ongoing
+write 2,conteo.byte0
+Write 3,conteo.byte1
+
+restart_button:
+if start=1 then goto test_ongoing
+pause 50
+goto restart_button ' Encierra hasta que haya un loop
+        
+ongoing_job: 'si esta rutina se ejecuta si hay trabajo pendiente. 
+                                     
+print_warning:
+lcdout $FE,1, "Pending job"
+lcdout $FE,$C5, "Continue?"
+
+check_resume:
+if start=1 then 
+gosub resume_sequence
+endif
+if parar=1 then 
+gosub stoppear
+endif
+goto check_resume:
+
+resume_sequence: 
+flash_lcd = 0
+FOr flash_lcd = 1 to 4
+lcdout $fe,1,"Resuming Job"
+pause 100
+lcdout $fe,1
+Pause 100
+NExt
+ongoing = 1
+write 1,ongoing
+read 2,conteo.byte0
+read 3,conteo.byte1
+goto job
+
+END
+
+
+
+
+
+
