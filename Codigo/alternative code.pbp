@@ -8,30 +8,33 @@
 '*  Notes   :                                                   *
 '*          :                                                   *
 '****************************************************************
-
+'TODO: 
+'Implementar la bienvenida
+'Confirmar el numero de vueltas = a 65530  y limpiar la pantalla. 
 
 variables:
 define LCD_DREG     PORTB  'definimos que puerto vamos a usar para el LCD
-DEFINE LCD_DBIT     4      'A partir de que pin
+DEFINE LCD_DBIT     0      'A partir de que pin
 DEFINE LCD_RSREG    PORTA  'Definimos en que puerto esta el RS
-DEFINE LCD_RSBIT    1      'RA1
+DEFINE LCD_RSBIT    2      'RA2
 DEFINE LCD_EREG     PORTA  'Definimos en que puerto esta el E
-DEFINE LCD_EBIT     0      'RA0                                                                      
+DEFINE LCD_EBIT     3      'RA3                                                                      
 conteo var word     'Armamos la variable conteo. Esta variable la vamos a cortar en dos y la vamos a copiar a la EEPROM
 ongoing var bit     'Variable para trabajo pendiente. Esta variable la vamos a copiar en la EEPROM
 flagpulso var bit   'Variable Flag 
 halt   var bit      'Variable que utilizamos para no sobreescribir la EEPROM en pausa.   
 stopped Var bit     'Variable que utilizamos para que no parpadee el lcd en stop.
-pulsos var portb.0  'Variable para los pulsos que entran 
-start  var porta.2  'Variable para start
-pausa  var porta.3  'Variable para la pausa
-parar  var porta.4  'Variable para stoppear
-relay  var portb.3  'Variable para el pin del relay
-flash_lcd var byte 'Variable para flashear LCD
-TRISA=%00011100     'Todos los pines son salidas. RA2,RA3,RA4 son por ahora las entradas.(PORTA)
-TRISB=%00000001     'Todos los pines son salidas (PORTB) 
+pulsos var portb.4  'Variable para los pulsos que entran 
+relay  var portb.5  'Variable para el pin del relay
+start  var portb.6  'Variable para start
+pausa  var portb.7  'Variable para la pausa
+parar  var porta.0  'Variable para stoppear
+
+flash_lcd var byte  'Variable para flashear LCD
+TRISB=%11010000     'Todos los pines son salidas. RA2,RA3,RA4 son por ahora las entradas.(PORTA)
+TRISA=%00010011     'Todos los pines son salidas (PORTB) 
 pause 200
-lcdout $fe,1,"Welcome" 'Primer mensaje al LCD 
+lcdout $fe,1,"Axis" 'Primer mensaje al LCD 
 'test remover antes de producción
 ongoing = 1
 conteo = 65530
