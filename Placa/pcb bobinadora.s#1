@@ -519,23 +519,6 @@ Source: http://www.molex.com/pdm_docs/sd/877580616_sd.pdf</description>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="GND" prefix="GND">
-<description>&lt;b&gt;Ground&lt;/b&gt;
-&lt;ul&gt;
-&lt;li&gt;use this to hook up ground connections throughout a schematic instead of running wire&lt;/li&gt;
-&lt;li&gt;automatically labels the net "GND"&lt;/li&gt;
-&lt;/ul&gt;</description>
-<gates>
-<gate name="GND" symbol="GND" x="0" y="0"/>
-</gates>
-<devices>
-<device name="">
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
 <deviceset name="OUT(T)" prefix="OUT">
 <description>&lt;b&gt;Output&lt;/b&gt;
 
@@ -567,6 +550,27 @@ Source: http://www.molex.com/pdm_docs/sd/877580616_sd.pdf</description>
 <connects>
 <connect gate="G$1" pin="+" pad="+"/>
 <connect gate="G$1" pin="-" pad="-"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="GND(T)" prefix="GND">
+<description>&lt;b&gt;Ground&lt;/b&gt;
+&lt;ul&gt;
+&lt;li&gt;use this to hook up ground (GND) throughout a schematic instead of running wire&lt;/li&gt;
+&lt;li&gt;automatically labels the net "GND"&lt;/li&gt;
+&lt;li&gt;adds a hookup pad to the circuit board (you can use several)&lt;/li&gt;
+&lt;/ul&gt;</description>
+<gates>
+<gate name="GND" symbol="GND" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SQUARE">
+<connects>
+<connect gate="GND" pin="GND" pad="1"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -2743,7 +2747,6 @@ Source: 008-0260-0_E.pdf</description>
 <parts>
 <part name="IC1" library="microchip" deviceset="PIC16F8*" device="P" technology="4A"/>
 <part name="X1" library="con-molex" deviceset="87758-3416" device=""/>
-<part name="GND1" library="gm-supply" deviceset="GND" device=""/>
 <part name="SW1" library="gm-switches" deviceset="MOMENTARY" device=""/>
 <part name="SW2" library="gm-switches" deviceset="MOMENTARY" device=""/>
 <part name="SW3" library="gm-switches" deviceset="MOMENTARY" device=""/>
@@ -2761,6 +2764,7 @@ Source: 008-0260-0_E.pdf</description>
 <part name="C4" library="gm-caps-electro-pol" deviceset="050" device="" value="1uF"/>
 <part name="C5" library="gm-caps-electro-pol" deviceset="050" device="" value="1uF"/>
 <part name="REG1" library="gm-regulators" deviceset="7805" device=""/>
+<part name="GND2" library="gm-supply" deviceset="GND(T)" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -2802,7 +2806,6 @@ Source: 008-0260-0_E.pdf</description>
 <instance part="X1" gate="-32" x="144.78" y="35.56"/>
 <instance part="X1" gate="-33" x="124.46" y="33.02"/>
 <instance part="X1" gate="-34" x="144.78" y="33.02"/>
-<instance part="GND1" gate="GND" x="109.22" y="-10.16"/>
 <instance part="SW1" gate="G$1" x="-12.7" y="53.34" rot="R90"/>
 <instance part="SW2" gate="G$1" x="-2.54" y="53.34" rot="R90"/>
 <instance part="SW3" gate="G$1" x="7.62" y="53.34" rot="R90"/>
@@ -2820,21 +2823,21 @@ Source: 008-0260-0_E.pdf</description>
 <instance part="C4" gate="1" x="-12.7" y="86.36"/>
 <instance part="C5" gate="1" x="12.7" y="86.36"/>
 <instance part="REG1" gate="G$1" x="0" y="91.44"/>
+<instance part="GND2" gate="GND" x="104.14" y="-10.16"/>
 </instances>
 <busses>
 </busses>
 <nets>
 <net name="GND" class="0">
 <segment>
-<pinref part="GND1" gate="GND" pin="GND"/>
 <wire x1="109.22" y1="12.7" x2="109.22" y2="0" width="0.1524" layer="91"/>
-<wire x1="109.22" y1="0" x2="109.22" y2="-7.62" width="0.1524" layer="91"/>
 <wire x1="109.22" y1="12.7" x2="50.8" y2="12.7" width="0.1524" layer="91"/>
 <wire x1="50.8" y1="12.7" x2="50.8" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="IC1" gate="G$1" pin="VSS"/>
 <wire x1="50.8" y1="27.94" x2="53.34" y2="27.94" width="0.1524" layer="91"/>
-<wire x1="109.22" y1="0" x2="43.18" y2="0" width="0.1524" layer="91"/>
+<wire x1="109.22" y1="0" x2="104.14" y2="0" width="0.1524" layer="91"/>
 <pinref part="R3" gate="G$1" pin="1"/>
+<wire x1="104.14" y1="0" x2="43.18" y2="0" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="0" x2="35.56" y2="0" width="0.1524" layer="91"/>
 <wire x1="35.56" y1="0" x2="7.62" y2="0" width="0.1524" layer="91"/>
 <wire x1="7.62" y1="0" x2="-2.54" y2="0" width="0.1524" layer="91"/>
@@ -2881,6 +2884,9 @@ Source: 008-0260-0_E.pdf</description>
 <wire x1="116.84" y1="0" x2="109.22" y2="0" width="0.1524" layer="91"/>
 <pinref part="X1" gate="-18" pin="S"/>
 <wire x1="116.84" y1="53.34" x2="142.24" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="GND2" gate="GND" pin="GND"/>
+<wire x1="104.14" y1="-7.62" x2="104.14" y2="0" width="0.1524" layer="91"/>
+<junction x="104.14" y="0"/>
 </segment>
 </net>
 <net name="N$7" class="0">
@@ -2981,7 +2987,7 @@ Source: 008-0260-0_E.pdf</description>
 <junction x="-12.7" y="91.44"/>
 </segment>
 </net>
-<net name="N$19" class="0">
+<net name="PWR" class="0">
 <segment>
 <pinref part="C5" gate="1" pin="+"/>
 <wire x1="12.7" y1="91.44" x2="12.7" y2="88.9" width="0.1524" layer="91"/>
